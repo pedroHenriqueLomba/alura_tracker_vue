@@ -1,6 +1,6 @@
 <template>
     <BoxAmarela>
-        <div class="columns">
+        <div class="columns tarefa" @click="tarefaClicada">
             <div class="column is-5">
                 {{ tarefa.descricao || 'Tarefa sem descrição' }}
             </div>
@@ -15,21 +15,38 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { PropType } from 'vue';
 import CronometroTarefa from './CronometroTarefa.vue';
 import ITarefa from '@/interfaces/ITarefa';
 import BoxAmarela from './BoxAmarela.vue';
 
-export default {
+export default defineComponent({
     name: 'TarefaConcluida',
     components: {
         CronometroTarefa,
         BoxAmarela
     },
     props: {
-        tarefa: { type: Object as PropType<ITarefa>, required: true }
+        tarefa: {
+            type: Object as PropType<ITarefa>,
+            required: true
+        }
+    },
+    setup(props, { emit }) {
+        const tarefaClicada = (): void => {
+            emit('aoTarefaClicada', props.tarefa)
+        }
+
+        return {
+            tarefaClicada
+        }
     }
-}
+})
 </script>
 
-<style scoped></style>
+<style scoped>
+.tarefa {
+    cursor: pointer;
+}
+</style>

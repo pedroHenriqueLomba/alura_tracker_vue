@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section class="lista-projetos">
         <RouterLink to="/projetos/novo" class="button">
             <span class="icon is-small">
                 <i class="fas fa-plus"></i>
@@ -39,7 +39,10 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { useStore } from '@/store';
+import useNotificador from '@/hooks/notificador'
 import { EXCLUIR_PROJETO } from '@/store/tiposMutations';
+import { OBTER_PROJETOS } from '@/store/tiposAcoes';
+import { TipoNotificacao } from '@/interfaces/INotificacao';
 
 export default defineComponent({
     name: 'ListaProjeto',
@@ -49,19 +52,33 @@ export default defineComponent({
         }
     },
     setup() {
-        const store = useStore()
+        const store = useStore();
+
+        const { notificar } = useNotificador()
+
+        store.dispatch(OBTER_PROJETOS)
+
         return {
-            projetos: computed(() => store.state.projetos),
-            store
+            projetos: computed(() => store.state.projeto.projetos),
+            store,
+            notificar
         }
     },
     methods: {
-        excluir(idProjeto: string): void{
-            this.store.commit(EXCLUIR_PROJETO, idProjeto)
+        excluir(idProjeto: string): void {
+            this.store.dispatch(EXCLUIR_PROJETO, idProjeto)
+                .then(() => this.notificar(TipoNotificacao.SUCESSO, 'Sucesso', "Projeto apagado com sucesso"));
         }
     }
 })
 </script>
   
-<style scoped></style>
+<style scoped>
+.lista-projetos table,
+.lista-projetos table th,
+.lista-projetos table td {
+    background-color: var(--bg-primario);
+    color: var(--texto-primario);
+}
+</style>
   

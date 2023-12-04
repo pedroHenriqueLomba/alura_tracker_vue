@@ -22,37 +22,43 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import TemporizadorTarefa from './TemporizadorTarefa.vue';
 import { useStore } from '@/store';
+import { OBTER_PROJETOS } from '@/store/tiposAcoes';
+import IProjeto from '@/interfaces/IProjeto';
 
 export default defineComponent({
     name: "FormularioCronometro",
     components: {
         TemporizadorTarefa
     },
-    methods: {
-        finalizarTarefa(tempoDeExecucao: number): void {
-            this.$emit("terminarTarefa", {
+    emits: ['terminarTarefa'],
+    setup(props, { emit }) {
+        const store = useStore()
+
+        const descricao = ref("");
+        const idProjeto = ref("");
+
+        store.dispatch(OBTER_PROJETOS);
+
+        const projetos = computed(() => store.state.projeto.projetos);
+
+        const finalizarTarefa = (tempoDeExecucao: number): void => {
+            emit("terminarTarefa", {
                 id: new Date().toISOString(),
                 tempoDeExecucao: tempoDeExecucao,
-                descricao: this.descricao,
-                projeto: this.projetos.find(projeto => projeto.id == this.idProjeto)
+                descricao: descricao.value,
+                projeto: projetos.value.find((projeto: IProjeto) => projeto.id === idProjeto.value)
             });
-            this.descricao = '';
+            descricao.value = '';
         }
-    },
-    data() {
+
         return {
-            descricao: '',
-            idProjeto: ''
-        }
-    },
-    emits: ['terminarTarefa'],
-    setup() {
-        const store = useStore()
-        return {
-            projetos: computed(() => store.state.projetos)
+            finalizarTarefa,
+            descricao,
+            idProjeto,
+            projetos
         }
     }
 })

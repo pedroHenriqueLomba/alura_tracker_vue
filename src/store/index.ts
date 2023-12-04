@@ -1,13 +1,13 @@
 import { InjectionKey } from 'vue'
-import type IProjeto from '../interfaces/IProjeto'
 import { createStore, Store, useStore as vuexUseStore } from 'vuex'
-import { ADICIONAR_PROJETO, ALTERAR_PROJETO, EXCLUIR_PROJETO, ADICIONAR_TAREFA, ADICIONAR_NOTIFICACAO } from './tiposMutations';
-import ITarefa from '@/interfaces/ITarefa';
+import { ADICIONAR_NOTIFICACAO } from './tiposMutations';
 import { INotificacao } from '@/interfaces/INotificacao';
+import { EstadoProjeto, projeto } from './modulos/projetos';
+import { EstadoTarefa, tarefa } from './modulos/tarefas';
 
-interface Estado {
-    projetos: IProjeto[],
-    tarefas: ITarefa[],
+export interface Estado {
+    projeto: EstadoProjeto,
+    tarefa: EstadoTarefa,
     notificacoes: INotificacao[]
 }
 
@@ -15,29 +15,16 @@ export const key: InjectionKey<Store<Estado>> = Symbol()
 
 export const store = createStore<Estado>({
     state: {
-        projetos: [],
-        tarefas: [],
-        notificacoes: []
+        notificacoes: [],
+        tarefa: {
+            tarefas: []
+        },
+        projeto: {
+            projetos: []
+        }
     },
     mutations: {
-        [ADICIONAR_PROJETO](state, nomeProjeto: string) {
-            const projeto = {
-                id: new Date().toISOString(),
-                nome: nomeProjeto
-            } as IProjeto
-            state.projetos.push(projeto);
-        },
-        [ALTERAR_PROJETO](state, projeto: IProjeto) {
-            const index = state.projetos.findIndex(proj => proj.id === projeto.id);
-            state.projetos[index] = projeto;
-        },
-        [EXCLUIR_PROJETO](state, idProjeto: string){
-            state.projetos = state.projetos.filter((proj) => proj.id !== idProjeto);
-        },
-        [ADICIONAR_TAREFA](state, tarefa: ITarefa) {
-            state.tarefas.push(tarefa);
-        },
-        [ADICIONAR_NOTIFICACAO](state, notificacao: INotificacao){
+        [ADICIONAR_NOTIFICACAO](state, notificacao: INotificacao) {
             notificacao.id = new Date().toISOString();
             state.notificacoes.push(notificacao);
 
@@ -45,6 +32,10 @@ export const store = createStore<Estado>({
                 state.notificacoes = state.notificacoes.filter((noti) => noti.id !== notificacao.id)
             }, 2500)
         }
+    },
+    modules: {
+        projeto,
+        tarefa
     }
 })
 
