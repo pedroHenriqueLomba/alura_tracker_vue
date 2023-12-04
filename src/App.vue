@@ -4,52 +4,33 @@
       <BarraLateral @alterar-tema="alterarTema" />
     </div>
     <div class="column is-three-quarter conteudo">
-      <Formulario @terminar-tarefa="salvarTarefa($event)" />
-      <div class="lista">
-        <TarefaConcluida v-for="(tarefa, index) in tarefas" :key="index" :tarefa="tarefa" />
-        <BoxAmarela v-if="listaVazia">
-          Não existem tarefas cadastradas :(
-        </BoxAmarela>
-      </div>
+      <NotificacaoGeral />
+      <RouterView/>
     </div>
   </main>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import NotificacaoGeral from './components/NotificacaoGeral.vue';
 import BarraLateral from "./components/BarraLateral.vue";
-import Formulario from "./components/Formulario.vue";
-import TarefaConcluida from './components/TarefaConcluida.vue';
-import BoxAmarela from './components/BoxAmarela.vue';
-import type ITarefa from './interfaces/ITarefa'
 
 export default defineComponent({
   name: 'App',
   components: {
     BarraLateral,
-    Formulario,
-    TarefaConcluida,
-    BoxAmarela
+    NotificacaoGeral
   },
   data() {
     return {
-      tarefas: [] as ITarefa[],
       modoEscuroAtivado: false
     }
   },
   methods: {
-    salvarTarefa(tarefa: ITarefa) {
-      this.tarefas.push(tarefa);
-    },
     alterarTema(modoEscuroAtivado: boolean) {
       this.modoEscuroAtivado = modoEscuroAtivado;
     }
   },
-  computed: {
-    listaVazia(): boolean {
-      return this.tarefas.length === 0;
-    }
-  }
 });
 </script>
 
